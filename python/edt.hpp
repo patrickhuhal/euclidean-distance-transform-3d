@@ -71,12 +71,12 @@ inline void toinfinite(float *f, const size_t voxels) {
  */
 template <typename T>
 void squared_edt_1d_multi_seg(
-    T* segids, float *d, const int n, 
-    const int stride, const float anistropy,
+    T* segids, float *d, const size_t n, 
+    const size_t stride, const float anistropy,
     const bool black_border=false
   ) {
 
-  int i;
+  int64_t i;
 
   T working_segid = segids[0];
 
@@ -101,7 +101,7 @@ void squared_edt_1d_multi_seg(
     }
   }
 
-  int min_bound = 0;
+  int64_t min_bound = 0;
   if (black_border) {
     d[n - stride] = (float)(segids[n - stride] != 0) * anistropy;
     min_bound = stride;
@@ -166,8 +166,8 @@ void squared_edt_1d_multi_seg(
 void squared_edt_1d_parabolic(
     float* f, 
     float *d, 
-    const int n, 
-    const int stride, 
+    const int64_t n, 
+    const int64_t stride, 
     const float anisotropy, 
     const bool black_border_left,
     const bool black_border_right
@@ -179,8 +179,8 @@ void squared_edt_1d_parabolic(
 
   const float w2 = anisotropy * anisotropy;
 
-  int k = 0;
-  int* v = new int[n]();
+  int64_t k = 0;
+  int64_t* v = new int64_t[n]();
   float* ranges = new float[n + 1]();
 
   ranges[0] = -INFINITY;
@@ -194,7 +194,7 @@ void squared_edt_1d_parabolic(
    */
   float s;
   float factor1, factor2;
-  for (int i = 1; i < n; i++) {
+  for (int64_t i = 1; i < n; i++) {
     factor1 = (i - v[k]) * w2;
     factor2 =  i + v[k];
     s = (f[i * stride] - f[v[k] * stride] + factor1 * factor2) / (2.0 * factor1);
@@ -213,13 +213,13 @@ void squared_edt_1d_parabolic(
   }
 
   float* vals = new float[k+1]();
-  for (int i = 0; i <= k; i++) {
+  for (int64_t i = 0; i <= k; i++) {
     vals[i] = f[v[i] * stride];
   }
 
   k = 0;
   float envelope;
-  for (int i = 0; i < n; i++) {
+  for (int64_t i = 0; i < n; i++) {
     while (ranges[k + 1] < i) { 
       k++;
     }
@@ -248,8 +248,8 @@ void squared_edt_1d_parabolic(
 void squared_edt_1d_parabolic(
     float* f, 
     float *d, 
-    const int n, 
-    const int stride, 
+    const size_t n, 
+    const size_t stride, 
     const float anisotropy
   ) {
 
@@ -259,8 +259,8 @@ void squared_edt_1d_parabolic(
 
   const float w2 = anisotropy * anisotropy;
 
-  int k = 0;
-  int* v = new int[n]();
+  size_t k = 0;
+  size_t* v = new size_t[n]();
   float* ranges = new float[n + 1]();
 
   ranges[0] = -INFINITY;
@@ -274,7 +274,7 @@ void squared_edt_1d_parabolic(
    */
   float s;
   float factor1, factor2;
-  for (int i = 1; i < n; i++) {
+  for (size_t i = 1; i < n; i++) {
     factor1 = (i - v[k]) * w2;
     factor2 = i + v[k];
     s = (f[i * stride] - f[v[k] * stride] + factor1 * factor2) / (2.0 * factor1);
@@ -293,13 +293,13 @@ void squared_edt_1d_parabolic(
   }
 
   float* vals = new float[k+1]();
-  for (int i = 0; i <= k; i++) {
+  for (size_t i = 0; i <= k; i++) {
     vals[i] = f[v[i] * stride];
   }
 
   k = 0;
   float envelope;
-  for (int i = 0; i < n; i++) {
+  for (size_t i = 0; i < n; i++) {
     while (ranges[k + 1] < i) { 
       k++;
     }
@@ -319,8 +319,8 @@ void squared_edt_1d_parabolic(
 void _squared_edt_1d_parabolic(
     float* f, 
     float *d, 
-    const int n, 
-    const int stride, 
+    const size_t n, 
+    const size_t stride, 
     const float anisotropy, 
     const bool black_border_left,
     const bool black_border_right
@@ -350,14 +350,14 @@ void _squared_edt_1d_parabolic(
 template <typename T>
 void squared_edt_1d_parabolic_multi_seg(
     T* segids, float* f, float *d, 
-    const int n, const int stride, const float anisotropy,
+    const int64_t n, const int64_t stride, const float anisotropy,
     const bool black_border=false) {
 
   T working_segid = segids[0];
   T segid;
-  int last = 0;
+  int64_t last = 0;
 
-  for (int i = 1; i < n; i++) {
+  for (int64_t i = 1; i < n; i++) {
     segid = segids[i * stride];
     if (segid == 0) {
       continue;
@@ -727,13 +727,13 @@ namespace edt {
 template <typename T>
 float* edt(
   T* labels, 
-  const int sx, const float wx, 
+  const int64_t sx, const float wx, 
   const bool black_border=false) {
 
   float* d = new float[sx]();
   pyedt::squared_edt_1d_multi_seg(labels, d, sx, 1, wx);
 
-  for (int i = 0; i < sx; i++) {
+  for (int64_t i = 0; i < sx; i++) {
     d[i] = std::sqrt(d[i]);
   }
 
@@ -742,7 +742,7 @@ float* edt(
 
 template <typename T>
 float* edt(T* labels, 
-  const int sx, const int sy, 
+  const int64_t sx, const int64_t sy, 
   const float wx, const float wy,
   const bool black_border=false) {
 
@@ -753,7 +753,7 @@ float* edt(T* labels,
 template <typename T>
 float* edt(
   T* labels, 
-  const int sx, const int sy, const int sz, 
+  const int64_t sx, const int64_t sy, const int64_t sz, 
   const float wx, const float wy, const float wz,
   const bool black_border=false) {
 
@@ -763,7 +763,7 @@ float* edt(
 template <typename T>
 float* binary_edt(
   T* labels, 
-  const int sx, 
+  const int64_t sx, 
   const float wx, 
   const bool black_border=false) {
 
@@ -773,7 +773,7 @@ float* binary_edt(
 template <typename T>
 float* binary_edt(
   T* labels, 
-  const int sx, const int sy, 
+  const int64_t sx, const int64_t sy, 
   const float wx, const float wy, 
   const bool black_border=false) {
 
@@ -783,7 +783,7 @@ float* binary_edt(
 template <typename T>
 float* binary_edt(
   T* labels, 
-  const int sx, const int sy, const int sz, 
+  const int64_t sx, const int64_t sy, const int64_t sz, 
   const float wx, const float wy, const float wz,
   const bool black_border=false) {
 
@@ -793,7 +793,7 @@ float* binary_edt(
 template <typename T>
 float* edtsq(
   T* labels, 
-  const int sx, const float wx, 
+  const int64_t sx, const float wx, 
   const bool black_border=false) {
 
   float* d = new float[sx]();
@@ -804,7 +804,7 @@ float* edtsq(
 template <typename T>
 float* edtsq(
   T* labels, 
-  const int sx, const int sy, 
+  const int64_t sx, const int64_t sy, 
   const float wx, const float wy,
   const bool black_border=false) {
 
@@ -814,7 +814,7 @@ float* edtsq(
 template <typename T>
 float* edtsq(
   T* labels, 
-  const int sx, const int sy, const int sz, 
+  const int64_t sx, const int64_t sy, const int64_t sz, 
   const float wx, const float wy, const float wz,
   const bool black_border=false) {
 
@@ -824,7 +824,7 @@ float* edtsq(
 template <typename T>
 float* binary_edtsq(
   T* labels, 
-  const int sx, const float wx, 
+  const int64_t sx, const float wx, 
   const bool black_border=false) {
 
   return edt::edtsq(labels, sx, wx, black_border);
@@ -833,7 +833,7 @@ float* binary_edtsq(
 template <typename T>
 float* binary_edtsq(
   T* labels, 
-  const int sx, const int sy, 
+  const int64_t sx, const int64_t sy, 
   const float wx, const float wy,
   const bool black_border=false) {
 
@@ -843,7 +843,7 @@ float* binary_edtsq(
 template <typename T>
 float* binary_edtsq(
   T* labels, 
-  const int sx, const int sy, const int sz, 
+  const int64_t sx, const int64_t sy, const int64_t sz, 
   const float wx, const float wy, const float wz,
   const bool black_border=false) {
   return pyedt::_binary_edt3dsq(labels, sx, sy, sz, wx, wy, wz);
